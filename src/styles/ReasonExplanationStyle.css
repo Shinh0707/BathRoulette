@@ -70,10 +70,12 @@
   text-align: right;
 }
 
-.reason-meta a {
+.reason-meta a,
+.reason-credit {
   font-size: 0.7rem;
   color: #94a3b8;
   text-decoration: none;
+  user-select: none;
 }
 
 .reason-meta a:hover {

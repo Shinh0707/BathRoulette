@@ -1,45 +1,29 @@
 import { type IWeatherService } from "./IWeatherService";
 import { type EnvironmentReason } from "../models/EnvironmentReason";
 
+interface AmedasStation {
+  lat: [number, number];
+  lon: [number, number];
+  kjName: string;
+}
+
 export class WeatherService implements IWeatherService {
   public readonly serviceName = "WeatherService";
+
+  private readonly latestTimeUrl = "/jma-bosai/bosai/amedas/data/latest_time.txt";
+  private readonly mapBaseUrl = "/jma-bosai/bosai/amedas/data/map/";
+  private readonly stationTableUrl = "/jma-bosai/bosai/amedas/const/amedastable.json";
 
   public async fetchAdverseEnvironmentReason(): Promise<EnvironmentReason> {
     try {
       const position = await this.retrieveCoordinates();
-      const latitude = position.coords.latitude;
-      const longitude = position.coords.longitude;
+      const stationCode = await this.resolveClosestStation(
+        position.coords.latitude,
+        position.coords.longitude
+      );
 
-      const params = new URLSearchParams({
-        latitude: latitude.toString(),
-        longitude: longitude.toString(),
-        current: "surface_pressure,relative_humidity_2m,apparent_temperature,weather_code,cloud_cover",
-        timezone: "auto",
-      });
-
-      const endpoint = `https://api.open-meteo.com/v1/forecast?${params.toString()}`;
-      const response = await fetch(endpoint);
-
-      if (!response.ok) {
-        throw new Error("気象データの取得に失敗しました");
-      }
-
-      const payload = await response.json();
-      const current = payload.current;
-
-      const pressure = current?.surface_pressure ?? 1013.25;
-      const humidity = current?.relative_humidity_2m ?? 50;
-      const apparentTemp = current?.apparent_temperature ?? 20;
-      const cloudCover = current?.cloud_cover ?? 0;
-      const weatherCode = current?.weather_code ?? 0;
-
-      return this.constructIntuitiveReport({
-        pressure,
-        humidity,
-        apparentTemp,
-        cloudCover,
-        weatherCode,
-      });
+      const observation = await this.fetchLatestObservation(stationCode);
+      return this.constructIntuitiveReport(observation);
     } catch {
       return {
         icon: "☁️",
@@ -61,48 +45,85 @@ export class WeatherService implements IWeatherService {
     });
   }
 
-  private constructIntuitiveReport(data: {
-    pressure: number;
-    humidity: number;
-    apparentTemp: number;
-    cloudCover: number;
-    weatherCode: number;
-  }): EnvironmentReason {
-    const isLowPressure = data.pressure < 1012;
-    const isHighHumidity = data.humidity >= 65;
-    const isRain = (data.weatherCode >= 51 && data.weatherCode <= 67) || (data.weatherCode >= 80 && data.weatherCode <= 82);
-    const isOvercast = data.cloudCover >= 80;
-    const isHot = data.apparentTemp >= 28;
-    const isCold = data.apparentTemp <= 10;
+  private async resolveClosestStation(lat: number, lon: number): Promise<string> {
+    const res = await fetch(this.stationTableUrl);
+    if (!res.ok) return "44132"; // 取得失敗時は東京観測所
 
-    // 気圧が低く湿気もある日
-    if (isLowPressure && isHighHumidity) {
+    const table: Record<string, AmedasStation> = await res.json();
+    let closestCode = "44132";
+    let minDistance = Infinity;
+
+    for (const [code, station] of Object.entries(table)) {
+      const stationLat = station.lat[0] + station.lat[1] / 60;
+      const stationLon = station.lon[0] + station.lon[1] / 60;
+
+      const dLat = lat - stationLat;
+      const dLon = (lon - stationLon) * Math.cos((lat * Math.PI) / 180);
+      const distanceSq = dLat * dLat + dLon * dLon;
+
+      if (distanceSq < minDistance) {
+        minDistance = distanceSq;
+        closestCode = code;
+      }
+    }
+
+    return closestCode;
+  }
+
+  private async fetchLatestObservation(stationCode: string): Promise<{
+    rainfall1h: number;
+    temp: number;
+    humidity: number;
+    sun1h: number;
+  }> {
+    const timeRes = await fetch(this.latestTimeUrl);
+    if (!timeRes.ok) throw new Error("最新時刻の取得に失敗しました");
+
+    const rawText = await timeRes.text();
+    const timeKey = rawText.replace(/[^0-9]/g, "").slice(0, 14);
+
+    const mapRes = await fetch(`${this.mapBaseUrl}${timeKey}.json`);
+    if (!mapRes.ok) throw new Error("アメダスデータの取得に失敗しました");
+
+    const mapData = await mapRes.json();
+    const stationData = mapData[stationCode] || mapData["44132"];
+
+    const rainfall1h = stationData?.precipitation1h ? stationData.precipitation1h[0] : 0;
+    const temp = stationData?.temp ? stationData.temp[0] : 20;
+    const humidity = stationData?.humidity ? stationData.humidity[0] : 50;
+    const sun1h = stationData?.sun1h ? stationData.sun1h[0] : 0;
+
+    return { rainfall1h, temp, humidity, sun1h };
+  }
+
+  private constructIntuitiveReport(data: {
+    rainfall1h: number;
+    temp: number;
+    humidity: number;
+    sun1h: number;
+  }): EnvironmentReason {
+    const isRaining = data.rainfall1h > 0;
+    const isHot = data.temp >= 28;
+    const isCold = data.temp <= 10;
+    const isHighHumidity = data.humidity >= 70;
+    const isLowSun = data.sun1h === 0;
+
+    if (isRaining && isHighHumidity) {
       return {
-        icon: "🌀",
-        summary: "どんよりして、身体が重くなりやすい日ですね。",
-        detail: "湿気も多くて、立ち上がるだけでもエネルギーを使いやすい空気です。",
+        icon: "🌧️",
+        summary: "雨と湿り気が重なっている日ですね。",
+        detail: "湿度の高さと暗さで、立ち上がるだけでもエネルギーを使いやすい空気です。",
       };
     }
 
-    // 雨の日
-    if (isRain) {
+    if (isRaining) {
       return {
-        icon: "🌧️",
+        icon: "☔",
         summary: "雨が降っていて、外も少し暗い日ですね。",
         detail: "気分のスイッチが入りにくいのは、天気のせいなのでとても自然なことです。",
       };
     }
 
-    // 気圧低下
-    if (isLowPressure) {
-      return {
-        icon: "📉",
-        summary: "気圧が少し下がっている日ですね。",
-        detail: "空気が重たく感じられて、動作がゆっくりになりがちな頃合いです。",
-      };
-    }
-
-    // 暑さ・熱気
     if (isHot) {
       return {
         icon: "🌡️",
@@ -111,7 +132,6 @@ export class WeatherService implements IWeatherService {
       };
     }
 
-    // 寒さ・冷え
     if (isCold) {
       return {
         icon: "❄️",
@@ -120,8 +140,7 @@ export class WeatherService implements IWeatherService {
       };
     }
 
-    // 曇り・湿度高め
-    if (isHighHumidity || isOvercast) {
+    if (isHighHumidity || isLowSun) {
       return {
         icon: "🌫️",
         summary: "すっきりしない空模様が続いていますね。",
@@ -129,7 +148,6 @@ export class WeatherService implements IWeatherService {
       };
     }
 
-    // デフォルト
     return {
       icon: "🍃",
       summary: "天気の移り変わりがある一日ですね。",
