@@ -6,4 +6,13 @@ const repositoryName = process.env.GITHUB_REPOSITORY
 
 export default defineConfig({
   base: repositoryName,
+  server: {
+    proxy: {
+      '/jma-feed': {
+        target: 'https://www.data.jma.go.jp',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/jma-feed/, '')
+      }
+    }
+  }
 });
