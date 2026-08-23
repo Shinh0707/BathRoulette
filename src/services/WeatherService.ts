@@ -1,6 +1,8 @@
 import { type IWeatherService } from "./IWeatherService";
 import { type EnvironmentReason } from "../models/EnvironmentReason";
 
+const BASE_URL = import.meta.env.VITE_JMA_API_BASE;
+
 interface FeedEntry {
   id: string;
   title: string;
@@ -10,7 +12,7 @@ interface FeedEntry {
 export class WeatherService implements IWeatherService {
   public readonly serviceName = "WeatherService";
 
-  private readonly feedUrl = "/jma-feed/developer/xml/feed/regular.xml";
+  private readonly feedUrl = `${BASE_URL}/developer/xml/feed/regular.xml`;
   private domParser = new DOMParser();
 
   public async fetchAdverseEnvironmentReason(): Promise<EnvironmentReason> {
@@ -127,7 +129,7 @@ export class WeatherService implements IWeatherService {
       const link = entry.querySelector("link")?.getAttribute("href") || "";
 
       if (id && link) {
-        const relativeUrl = link.replace(/^https:\/\/www\.data\.jma\.go\.jp/, "/jma-feed");
+        const relativeUrl = link.replace(/^https:\/\/www\.data\.jma\.go\.jp/, BASE_URL);
         entries.push({ id, title, url: relativeUrl });
       }
     });
