@@ -14,5 +14,14 @@ export default defineConfig({
         rewrite: (path) => path.replace(/^\/jma-feed/, '')
       }
     }
+  },
+  preview: {
+    proxy: {
+      '/jma-feed': {
+        target: 'https://www.data.jma.go.jp',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/jma-feed/, '')
+      }
+    }
   }
 });
