@@ -1,84 +1,66 @@
-.reason-section {
-  border-top: 1.5px dashed #dceef5;
-  padding-top: 14px;
-  text-align: center;
-}
-
-.btn-reason-toggle {
-  background-color: transparent;
-  color: #64748b;
-  font-size: 0.85rem;
-  font-weight: 600;
-  padding: 6px 12px;
-  border: none;
-  cursor: pointer;
-  width: auto;
-  font-family: inherit;
-  transition: color 0.15s ease;
-}
-
-.btn-reason-toggle:hover {
-  color: #0284c7;
-}
-
-.reason-card {
-  margin-top: 10px;
-  padding: 14px 16px;
-  background-color: #f8fcfe;
-  border: 1.5px solid #e0f2fe;
-  border-radius: 16px;
-  text-align: left;
-}
-
-.reason-loading {
-  font-size: 0.85rem;
-  color: #94a3b8;
-  margin: 0;
-  text-align: center;
-}
-
-.reason-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 6px;
-}
-
-.reason-icon {
-  font-size: 1.25rem;
-  line-height: 1;
-}
-
-.reason-title {
-  font-size: 0.875rem;
-  font-weight: 700;
-  color: #0369a1;
-  margin: 0;
-}
-
-.reason-body {
-  font-size: 0.8rem;
-  color: #64748b;
-  margin: 0;
-  line-height: 1.5;
-}
-
 .reason-meta {
   border-top: 1px solid #e0f2fe;
   padding-top: 8px;
-  margin-top: 10px;
-  text-align: right;
+  margin-top: 12px;
+  text-align: left;
 }
 
-.reason-meta a,
-.reason-credit {
-  font-size: 0.7rem;
+.reason-notice {
+  font-size: 0.68rem;
   color: #94a3b8;
-  text-decoration: none;
+  line-height: 1.4;
+  margin: 0 0 6px 0;
+}
+
+.reason-links {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.reason-credit {
+  font-size: 0.65rem;
+  color: #94a3b8;
   user-select: none;
 }
 
-.reason-meta a:hover {
+.reason-disclaimer {
+  font-size: 0.65rem;
+  color: #94a3b8;
+}
+
+.reason-disclaimer summary {
+  cursor: pointer;
+  color: #64748b;
   text-decoration: underline;
-  color: #0284c7;
+  list-style: none;
+  display: inline-flex;
+  align-items: center;
+}
+
+.reason-disclaimer summary::-webkit-details-marker {
+  display: none;
+}
+
+.reason-disclaimer summary::before {
+  content: "▶ ";
+  font-size: 0.55rem;
+  margin-right: 2px;
+  transition: transform 0.15s ease;
+}
+
+.reason-disclaimer[open] summary::before {
+  transform: rotate(90deg);
+}
+
+.disclaimer-content {
+  margin-top: 4px;
+  padding: 6px 8px;
+  background-color: #f1f5f9;
+  border-radius: 6px;
+  font-size: 0.65rem;
+  color: #64748b;
+  line-height: 1.4;
 }
