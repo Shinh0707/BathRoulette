@@ -1,0 +1,1 @@
+export type RouletteStatus = "idle" | "spinning" | "completed";

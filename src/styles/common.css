@@ -1,0 +1,92 @@
+:root {
+  --bg-color: #eef7fa;
+  --card-bg: #ffffff;
+  --text-main: #2c3e50;
+  --text-muted: #7f97a8;
+  --border-color: #dceef5;
+  --primary: #38bdf8;
+  --primary-hover: #0ea5e9;
+  --primary-shadow: #bae6fd;
+  --font-family: -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Segoe UI", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 24px 16px;
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  font-family: var(--font-family);
+  line-height: 1.5;
+}
+
+.bath-app-container {
+  max-width: 440px;
+  margin: 0 auto;
+  background-color: var(--card-bg);
+  border-radius: 24px;
+  box-shadow: 0 12px 30px rgba(56, 189, 248, 0.12);
+  border: 2px solid #e0f2fe;
+  padding: 28px 20px;
+}
+
+.app-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.app-title {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #0369a1;
+  margin: 0;
+  letter-spacing: 0.04em;
+}
+
+.btn {
+  font-size: 0.95rem;
+  font-weight: 700;
+  padding: 14px 20px;
+  border-radius: 16px;
+  cursor: pointer;
+  border: none;
+  width: 100%;
+  font-family: inherit;
+  transition: transform 0.08s ease, opacity 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(2px);
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background-color: var(--primary);
+  color: #ffffff;
+  box-shadow: 0 4px 0 #0284c7;
+}
+
+.btn-primary:active:not(:disabled) {
+  box-shadow: 0 1px 0 #0284c7;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: var(--primary-hover);
+}
+
+.btn-secondary {
+  background-color: #f0f9ff;
+  color: #0284c7;
+  border: 1.5px solid #bae6fd;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background-color: #e0f2fe;
+}

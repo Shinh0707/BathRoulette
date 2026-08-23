@@ -1,0 +1,82 @@
+.reason-section {
+  border-top: 1.5px dashed #dceef5;
+  padding-top: 14px;
+  text-align: center;
+}
+
+.btn-reason-toggle {
+  background-color: transparent;
+  color: #64748b;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 6px 12px;
+  border: none;
+  cursor: pointer;
+  width: auto;
+  font-family: inherit;
+  transition: color 0.15s ease;
+}
+
+.btn-reason-toggle:hover {
+  color: #0284c7;
+}
+
+.reason-card {
+  margin-top: 10px;
+  padding: 14px 16px;
+  background-color: #f8fcfe;
+  border: 1.5px solid #e0f2fe;
+  border-radius: 16px;
+  text-align: left;
+}
+
+.reason-loading {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  margin: 0;
+  text-align: center;
+}
+
+.reason-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.reason-icon {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.reason-title {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #0369a1;
+  margin: 0;
+}
+
+.reason-body {
+  font-size: 0.8rem;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.reason-meta {
+  border-top: 1px solid #e0f2fe;
+  padding-top: 8px;
+  margin-top: 10px;
+  text-align: right;
+}
+
+.reason-meta a {
+  font-size: 0.7rem;
+  color: #94a3b8;
+  text-decoration: none;
+}
+
+.reason-meta a:hover {
+  text-decoration: underline;
+  color: #0284c7;
+}
