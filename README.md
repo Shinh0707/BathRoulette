@@ -38,7 +38,7 @@
 ### インストール
 
 ```bash
-git clone [https://github.com/Shinh0707/BathRoulette.git](https://github.com/Shinh0707/BathRoulette.git)
+git clone https://github.com/Shinh0707/BathRoulette.git
 cd BathRoulette
 npm install
 ```
